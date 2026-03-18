@@ -7,7 +7,9 @@ export class QueueService {
     private queue: Queue;
 
     constructor() {
-        const connection = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+        const connection = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+            maxRetriesPerRequest: null
+        });
         this.queue = new Queue('clicks', { connection: connection as any });
     }
 

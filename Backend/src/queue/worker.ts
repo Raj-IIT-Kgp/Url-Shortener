@@ -3,7 +3,9 @@ import { Worker } from 'bullmq';
 import Redis from 'ioredis';
 
 // This Redis instance handles your custom `clicks:code` counter.
-const redisClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redisClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+    maxRetriesPerRequest: null
+});
 
 export const clickWorker = new Worker(
     'clicks',
