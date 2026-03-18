@@ -1,5 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+
+// Start your background workers synchronously 
+// inside the exact same Render server as your API
+import './queue/worker';
+import './queue/batch.processor';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {

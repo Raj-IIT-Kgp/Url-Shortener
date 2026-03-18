@@ -1,11 +1,9 @@
+import 'dotenv/config';
 import { Worker } from 'bullmq';
 import Redis from 'ioredis';
 
 // This Redis instance handles your custom `clicks:code` counter.
-const redisClient = new Redis({
-    host: 'localhost',
-    port: 6379,
-});
+const redisClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 
 export const clickWorker = new Worker(
     'clicks',
@@ -15,13 +13,7 @@ export const clickWorker = new Worker(
         // increment counter in Redis
         await redisClient.incr(`clicks:${code}`);
     },
-    {
-        // This inline connection ensures BullMQ won't throw any TypeScript red lines!
-        connection: {
-            host: 'localhost',
-            port: 6379,
-        }
-    },
+    { connection: redisClient as any }
 );
 
 clickWorker.on('completed', job => {
