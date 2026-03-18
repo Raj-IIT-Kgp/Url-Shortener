@@ -28,9 +28,10 @@ export class UrlService {
             },
         });
 
+        const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
         return {
             shortCode: url.shortCode,
-            shortUrl: `http://localhost:3000/${url.shortCode}`,
+            shortUrl: `${baseUrl}/${url.shortCode}`,
         };
     }
 }
