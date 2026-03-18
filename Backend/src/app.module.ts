@@ -7,11 +7,12 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { PrismaService } from './prisma/prisma.service';
 import { RedisService } from './redis/redis.service';
 import { RateLimiterService } from './common/rate-limiter.service';
+import { QueueService } from './queue/queue.service';
 
 @Module({
   imports: [UrlModule, RedirectModule, AnalyticsModule],
   controllers: [AppController],
-  providers: [AppService, PrismaService, RedisService, RateLimiterService],
+  providers: [AppService, PrismaService, RedisService, RateLimiterService, QueueService],
   exports: [PrismaService, RedisService],
 })
 export class AppModule { }
