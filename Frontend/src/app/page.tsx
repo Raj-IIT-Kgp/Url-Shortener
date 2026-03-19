@@ -100,9 +100,14 @@ export default function Home() {
                 <div className="mt-6 w-full max-w-2xl glass rounded-2xl p-6 glow-accent animate-[fadeIn_0.4s_ease-out]">
                     <p className="text-sm text-[var(--color-text-muted)] mb-3">Your shortened URL is ready 🎉</p>
                     <div className="flex items-center gap-3">
-                        <div className="flex-1 px-4 py-3 rounded-xl bg-[var(--color-surface-light)] border border-[var(--color-border)] font-mono text-[var(--color-accent-light)] truncate text-lg">
+                        <a
+                            href={result.shortUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 px-4 py-3 rounded-xl bg-[var(--color-surface-light)] border border-[var(--color-border)] font-mono text-[var(--color-accent-light)] truncate text-lg hover:underline transition-all block"
+                        >
                             {result.shortUrl}
-                        </div>
+                        </a>
                         <button
                             onClick={handleCopy}
                             className="px-5 py-3 rounded-xl font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap text-sm"
