@@ -7,6 +7,8 @@ const redisClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379',
     maxRetriesPerRequest: null
 });
 
+redisClient.on('error', (err) => console.error('Redis (worker) error:', err));
+
 export const clickWorker = new Worker(
     'clicks',
     async job => {

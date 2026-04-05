@@ -7,6 +7,7 @@ export class RedisService {
 
     constructor() {
         this.client = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+        this.client.on('error', (err) => console.error('Redis error:', err));
     }
 
     async get(key: string) {
