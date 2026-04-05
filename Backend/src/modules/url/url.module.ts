@@ -6,8 +6,8 @@ import { RateLimiterService } from '../../common/rate-limiter.service';
 import { AnalyticsModule } from '../analytics/analytics.module';
 
 @Module({
-  imports: [AnalyticsModule],
-  providers: [UrlService, PrismaService, RateLimiterService],
-  controllers: [UrlController]
+    imports: [AnalyticsModule],
+    providers: [UrlService, PrismaService, RateLimiterService],
+    controllers: [UrlController],
 })
-export class UrlModule { }
+export class UrlModule {}

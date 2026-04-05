@@ -1,20 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import Redis from 'ioredis';
+import { REDIS_CLIENT } from './redis.constants';
 
 @Injectable()
 export class RedisService {
-    private client: Redis;
+    private readonly logger = new Logger(RedisService.name);
 
-    constructor() {
-        this.client = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-        this.client.on('error', (err) => console.error('Redis error:', err));
-    }
+    constructor(@Inject(REDIS_CLIENT) private readonly client: Redis) {}
 
-    async get(key: string) {
+    async get(key: string): Promise<string | null> {
         return this.client.get(key);
     }
 
-    async set(key: string, value: string) {
-        return this.client.set(key, value, 'EX', 3600); // cache 1 hour
+    async set(key: string, value: string, ttlSeconds = 3600): Promise<void> {
+        await this.client.set(key, value, 'EX', ttlSeconds);
+    }
+
+    async del(key: string): Promise<void> {
+        await this.client.del(key);
+    }
+
+    async incr(key: string): Promise<number> {
+        return this.client.incr(key);
     }
 }

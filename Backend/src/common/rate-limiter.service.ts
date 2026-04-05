@@ -1,14 +1,14 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 import Redis from 'ioredis';
+import { REDIS_CLIENT } from '../redis/redis.constants';
 
 @Injectable()
 export class RateLimiterService {
+    private readonly logger = new Logger(RateLimiterService.name);
     private limiter: RateLimiterRedis;
 
-    constructor() {
-        const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-
+    constructor(@Inject(REDIS_CLIENT) redis: Redis) {
         this.limiter = new RateLimiterRedis({
             storeClient: redis,
             keyPrefix: 'rate_limit',
@@ -21,6 +21,7 @@ export class RateLimiterService {
         try {
             await this.limiter.consume(ip);
         } catch {
+            this.logger.warn(`Rate limit exceeded for IP: ${ip}`);
             throw new HttpException('Too many requests', HttpStatus.TOO_MANY_REQUESTS);
         }
     }
