@@ -1,0 +1,39 @@
+# Node / Build
+node_modules/
+dist/
+.next/
+out/
+build/
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
+
+# AI and Editor configs
+.claude/
+.cursor/
+.code-review-graph/
+.cursorrules
+.windsurfrules
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+.mcp.json
+.opencode.json
+PROJECT.txt
+
+# Docker
+docker-compose.yml
+docker-compose.override.yml
+# Avoid ignoring docker-compose.prod.yml as it is needed for production deployment.
+
+
