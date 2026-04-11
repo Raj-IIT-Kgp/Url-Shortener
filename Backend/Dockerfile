@@ -24,6 +24,9 @@ FROM node:20-slim AS production
 
 WORKDIR /app
 
+# Install OpenSSL — required by Prisma on Debian-slim images
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nestjs
 
@@ -39,11 +42,15 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
+# Copy Prisma CLI from builder (devDependency — not installed by npm ci --only=production)
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
+
 # Switch to non-root user
 USER nestjs
 
 # Expose backend port
 EXPOSE 3001
 
-# Start the application
-CMD [ "node", "dist/src/main.js" ]
+# Run migrations then start the app
+CMD ["sh", "-c", "node_modules/.bin/prisma migrate deploy && node dist/src/main.js"]
