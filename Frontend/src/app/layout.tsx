@@ -1,31 +1,52 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import { ToastProvider } from '@/components/Toast';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { AuthProvider } from '@/components/AuthProvider';
+import { Header } from '@/components/Header';
 
-const inter = Inter({
-    subsets: ["latin"],
-    variable: "--font-sans",
-});
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-    title: "Snip — Lightning-Fast URL Shortener",
-    description: "Shorten your URLs instantly with powerful analytics and blazing-fast redirects.",
+    title: 'Snip | Modern URL Shortener',
+    description: 'A beautiful, fast, and secure URL shortener.',
 };
 
 export default function RootLayout({
     children,
-}: Readonly<{
+}: {
     children: React.ReactNode;
-}>) {
+}) {
     return (
         <html lang="en" className="dark">
-            <body className={`${inter.variable} antialiased min-h-screen`}>
-                {/* Ambient background glow */}
-                <div className="fixed inset-0 -z-10 overflow-hidden">
-                    <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-[var(--color-primary)] opacity-[0.03] blur-[120px]" />
-                    <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[var(--color-accent)] opacity-[0.03] blur-[120px]" />
-                </div>
-                {children}
+            <head>
+                <link rel="icon" href="/favicon.ico" sizes="any" />
+                <link
+                    rel="icon"
+                    href="/icon?<generated>"
+                    type="image/<generated>"
+                    sizes="<generated>"
+                />
+                <link
+                    rel="apple-touch-icon"
+                    href="/apple-icon?<generated>"
+                    type="image/<generated>"
+                    sizes="<generated>"
+                />
+            </head>
+            <body
+                className={`${inter.className} min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50 selection:bg-indigo-500/30 transition-colors duration-300`}
+            >
+                <div className="absolute inset-0 z-[-1] bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-indigo-950 dark:via-slate-950 dark:to-purple-950 opacity-50 block dark:hidden"></div>
+                <ToastProvider>
+                    <AuthProvider>
+                        <Header />
+                        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative">
+                            {children}
+                        </main>
+                    </AuthProvider>
+                </ToastProvider>
             </body>
         </html>
     );

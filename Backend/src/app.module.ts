@@ -8,20 +8,27 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { PrismaService } from './prisma/prisma.service';
 import { RedisModule } from './redis/redis.module';
 import { RateLimiterService } from './common/rate-limiter.service';
-import { QueueService } from './queue/queue.service';
 import { HealthModule } from './health/health.module';
 import { envValidationSchema } from './config/env.validation';
+import { KafkaModule } from './kafka/kafka.module';
+import { GeoModule } from './geo/geo.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true, validationSchema: envValidationSchema }),
         RedisModule,
+        KafkaModule,
+        GeoModule,
         UrlModule,
         RedirectModule,
         AnalyticsModule,
         HealthModule,
+        AuthModule,
+        PrometheusModule.register({ path: '/metrics' }),
     ],
     controllers: [AppController],
-    providers: [AppService, PrismaService, RateLimiterService, QueueService],
+    providers: [AppService, PrismaService, RateLimiterService],
 })
 export class AppModule {}

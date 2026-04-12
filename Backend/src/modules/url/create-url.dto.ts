@@ -1,5 +1,6 @@
-import { IsUrl, IsOptional, IsString, Length, IsDateString } from 'class-validator';
+import { IsUrl, IsOptional, IsString, Length, IsDateString, IsInt, Min, Max } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
 export class CreateUrlDto {
     @ApiProperty({
@@ -27,4 +28,31 @@ export class CreateUrlDto {
     @IsOptional()
     @IsDateString()
     expiresAt?: string;
+
+    @ApiPropertyOptional({
+        description: 'Self-destruct after this many clicks (1–1,000,000).',
+        example: 10,
+    })
+    @IsOptional()
+    @Type(() => Number)
+    @IsInt()
+    @Min(1)
+    @Max(1_000_000)
+    maxClicks?: number;
+
+    @ApiPropertyOptional({
+        description: 'Password to protect the link. Min 4 characters.',
+        example: 'secret123',
+    })
+    @IsOptional()
+    @IsString()
+    @Length(4, 100)
+    password?: string;
+    @ApiPropertyOptional({
+        description: 'Webhook URL to hit when the link is clicked.',
+        example: 'https://webhook.site/xxx',
+    })
+    @IsOptional()
+    @IsUrl({ protocols: ['http', 'https'], require_protocol: true })
+    webhookUrl?: string;
 }

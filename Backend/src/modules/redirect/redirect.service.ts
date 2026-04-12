@@ -1,6 +1,11 @@
-import { GoneException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { GoneException, Injectable, Logger, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RedisService } from '../../redis/redis.service';
+
+export interface RedirectResult {
+    requiresPassword: boolean;
+    originalUrl?: string;
+}
 
 @Injectable()
 export class RedirectService {
@@ -11,12 +16,8 @@ export class RedirectService {
         private readonly redis: RedisService,
     ) {}
 
-    async getOriginalUrl(code: string): Promise<string> {
-        // 1. Cache check
-        const cached = await this.redis.get(code);
-        if (cached) return cached;
-
-        // 2. DB lookup
+    async getOriginalUrl(code: string): Promise<RedirectResult> {
+        // 1. Load URL record from DB (always needed for password/maxClicks checks)
         const url = await this.prisma.url.findUnique({ where: { shortCode: code } });
 
         if (!url) throw new NotFoundException('URL not found');
@@ -25,7 +26,23 @@ export class RedirectService {
             throw new GoneException('Link has expired');
         }
 
-        // 3. Cache with TTL that respects expiry so cache never serves a stale expired URL
+        // 2. Password-protected — caller must use verifyPassword endpoint
+        if (url.password) {
+            return { requiresPassword: true };
+        }
+
+        // 3. Max-clicks check (DB value + pending Redis buffer)
+        if (url.maxClicks !== null && url.maxClicks !== undefined) {
+            const pending = parseInt((await this.redis.get(`clicks:${code}`)) || '0');
+            if (url.clicks + pending >= url.maxClicks) {
+                throw new GoneException('This link has reached its maximum click limit');
+            }
+        }
+
+        // 4. Redis cache for non-protected URLs
+        const cached = await this.redis.get(code);
+        if (cached) return { requiresPassword: false, originalUrl: cached };
+
         let ttl = 3600;
         if (url.expiresAt) {
             const secondsUntilExpiry = Math.floor((url.expiresAt.getTime() - Date.now()) / 1000);
@@ -34,6 +51,6 @@ export class RedirectService {
 
         await this.redis.set(code, url.originalUrl, ttl);
 
-        return url.originalUrl;
+        return { requiresPassword: false, originalUrl: url.originalUrl };
     }
 }

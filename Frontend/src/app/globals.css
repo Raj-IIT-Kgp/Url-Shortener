@@ -2,27 +2,47 @@
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
 
+/* ── Dark Theme (default) ── */
+:root,
+[data-theme="dark"] {
   --color-background: #0a0a0f;
   --color-surface: #12121a;
   --color-surface-light: #1a1a2e;
   --color-border: #2a2a3e;
   --color-border-light: #3a3a4e;
-
   --color-primary: #6366f1;
   --color-primary-light: #818cf8;
   --color-primary-dark: #4f46e5;
-
   --color-accent: #06b6d4;
   --color-accent-light: #22d3ee;
-
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
-
   --color-text: #e2e8f0;
   --color-text-muted: #94a3b8;
   --color-text-dim: #64748b;
+}
+
+/* ── Light Theme ── */
+[data-theme="light"] {
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-light: #f1f5f9;
+  --color-border: #e2e8f0;
+  --color-border-light: #cbd5e1;
+  --color-primary: #6366f1;
+  --color-primary-light: #4f46e5;
+  --color-primary-dark: #4338ca;
+  --color-accent: #0891b2;
+  --color-accent-light: #0e7490;
+  --color-success: #059669;
+  --color-warning: #d97706;
+  --color-error: #dc2626;
+  --color-text: #0f172a;
+  --color-text-muted: #475569;
+  --color-text-dim: #94a3b8;
 }
 
 @layer base {
@@ -30,6 +50,7 @@
     background: var(--color-background);
     color: var(--color-text);
     font-family: var(--font-sans);
+    transition: background 0.2s ease, color 0.2s ease;
   }
 }
 
@@ -40,8 +61,20 @@
     border: 1px solid var(--color-border);
   }
 
+  [data-theme="light"] .glass {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--color-border);
+  }
+
   .glass-light {
     background: rgba(26, 26, 46, 0.5);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--color-border-light);
+  }
+
+  [data-theme="light"] .glass-light {
+    background: rgba(241, 245, 249, 0.8);
     backdrop-filter: blur(12px);
     border: 1px solid var(--color-border-light);
   }
@@ -81,4 +114,26 @@
       0 0 20px rgba(6, 182, 212, 0.15),
       0 0 60px rgba(6, 182, 212, 0.05);
   }
+}
+
+/* ── Toast animations ── */
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+@keyframes toast-out {
+  from { opacity: 1; transform: translateY(0)    scale(1); }
+  to   { opacity: 0; transform: translateY(20px) scale(0.95); }
+}
+
+.toast-enter { animation: toast-in  0.3s ease forwards; }
+.toast-leave { animation: toast-out 0.3s ease forwards; }
+
+/* ── Bar chart ── */
+.bar-fill {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  transition: width 0.6s ease;
 }

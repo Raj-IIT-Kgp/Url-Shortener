@@ -31,9 +31,29 @@ GEMINI.md
 .opencode.json
 PROJECT.txt
 
-# Docker
+# Docker & Databases
 docker-compose.yml
 docker-compose.override.yml
 # Avoid ignoring docker-compose.prod.yml as it is needed for production deployment.
+postgres_data/
+redis_data/
+kafka_data/
+prometheus_data/
+grafana_data/
+
+# Logs and databases
+*.log
+*.sqlite
+*.sqlite-journal
+
+# Temporary and Build files
+.cache/
+.tmp/
+.temp/
+tmp/
+.vercel
+.tsbuildinfo
+coverage/
+.prisma/
 
 
