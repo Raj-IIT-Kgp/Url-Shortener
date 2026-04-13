@@ -45,7 +45,7 @@ jobs:
           username: ${{ secrets.AZURE_VM_USERNAME }}
           key: ${{ secrets.AZURE_VM_SSH_KEY }}
           script: |
-            cd ~/url-shortener
+            cd ~/Url-Shortener
 
             # Ensure .env exists before deploying
             if [ ! -f .env ]; then
