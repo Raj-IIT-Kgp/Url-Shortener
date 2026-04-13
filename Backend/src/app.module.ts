@@ -18,14 +18,14 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true, validationSchema: envValidationSchema }),
+        HealthModule,
+        PrometheusModule.register({ path: '/metrics' }),
         RedisModule,
         KafkaModule,
         GeoModule,
         UrlModule,
         AnalyticsModule,
-        HealthModule,
         AuthModule,
-        PrometheusModule.register({ path: '/metrics' }),
         RedirectModule,
     ],
     controllers: [AppController],
