@@ -37,6 +37,7 @@ graph TD
 - **Backend**: NestJS, Prisma ORM, KafkaJS, ioredis, Passport (JWT + API Keys).
 - **Frontend**: Next.js 16 (App Router), Tailwind CSS 4, React 19.
 - **Infrastructure**: Docker, Nginx, PostgreSQL, Redis, Kafka (KRaft mode).
+- **Cloud/Deployment**: Microsoft Azure VM, GitHub Actions (CI/CD).
 - **Observability**: Prometheus, Grafana.
 
 ## 🚦 Getting Started
@@ -57,6 +58,31 @@ graph TD
    - **API Docs (Swagger)**: [http://localhost/api/docs](http://localhost/api/docs)
    - **Metrics**: [http://localhost/api/metrics](http://localhost/api/metrics)
    - **Grafana**: [http://localhost:3002](http://localhost:3002) (Login: `admin`/`admin`)
+
+## 🚀 Deployment (Azure)
+
+This project is configured for automated deployment to a **Microsoft Azure VM** via GitHub Actions.
+
+### 1. Infrastructure Preparation
+- Provision an **Azure VM** (Linux/Ubuntu recommended).
+- Install **Docker** and **Docker Compose v2** on the VM.
+- Open ports `80` (HTTP) and `443` (HTTPS) in the Azure Network Security Group.
+- Point your domain/subdomain (or DuckDNS) to the VM's Public IP.
+
+### 2. GitHub Configuration
+Add the following **Encrypted Secrets** to your GitHub repository:
+- `AZURE_VM_HOST`: The Public IP or Domain of your Azure VM.
+- `AZURE_VM_USER`: The SSH username (e.g., `azureuser` or `raj`).
+- `AZURE_VM_SSH_KEY`: Your private SSH key (must have access to the VM).
+
+### 3. Automated Flow
+Every push to the `main` branch triggers the following:
+1. **Lint & Test**: Ensures code quality and passes unit tests.
+2. **Deploy**:
+   - Connects to the Azure VM via SSH.
+   - Pulls the latest code.
+   - Rebuilds and restarts the production containers (`docker-compose.prod.yml`).
+   - Prunes old images to save disk space.
 
 ## 🔑 Environment Variables
 
