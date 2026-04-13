@@ -22,7 +22,16 @@ export async function GET(
         const internalApiUrl = process.env.INTERNAL_API_URL || (API_URL.startsWith('/') ? `http://backend:3001` : API_URL);
         const fetchUrl = `${internalApiUrl.replace(/\/$/, '')}/${code}`; // remove trailing slash if present
 
-        const res = await fetch(fetchUrl, { redirect: 'manual' });
+        const clientIp = _request.headers.get('x-forwarded-for') || _request.headers.get('x-real-ip') || '';
+        const userAgent = _request.headers.get('user-agent') || '';
+
+        const res = await fetch(fetchUrl, {
+            redirect: 'manual',
+            headers: {
+                'x-forwarded-for': clientIp,
+                'user-agent': userAgent,
+            },
+        });
 
         // 302 / 301 — pass the redirect straight through to the browser
         if (res.status === 301 || res.status === 302) {
