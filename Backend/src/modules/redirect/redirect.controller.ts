@@ -1,9 +1,11 @@
-import { Controller, Get, Param, Res, Req, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Param, Res, Req, HttpCode, HttpStatus, NotFoundException } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RedirectService } from './redirect.service';
 import type { Response, Request } from 'express';
 import { RateLimiterService } from '../../common/rate-limiter.service';
 import { KafkaProducerService } from '../../kafka/kafka.producer.service';
+
+const RESERVED_PATHS = new Set(['health', 'metrics', 'url', 'auth', 'api']);
 
 @ApiTags('redirect')
 @Controller()
@@ -17,6 +19,7 @@ export class RedirectController {
     @Get(':code')
     @ApiOperation({ summary: 'Redirect to original URL by short code' })
     async redirect(@Param('code') code: string, @Req() req: Request, @Res() res: Response) {
+        if (RESERVED_PATHS.has(code)) throw new NotFoundException();
         await this.rateLimiter.consume(req.ip ?? '');
 
         const result = await this.redirectService.getOriginalUrl(code);
