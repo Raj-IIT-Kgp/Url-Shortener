@@ -10,7 +10,7 @@ export class ApiKeyGuard implements CanActivate {
         const apiKey = request.headers['x-api-key'];
 
         if (!apiKey) {
-            return false;
+            return true;
         }
 
         const user = await this.prisma.user.findUnique({
