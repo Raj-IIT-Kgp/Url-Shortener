@@ -3,6 +3,7 @@ import { BadRequestException, InternalServerErrorException } from '@nestjs/commo
 import { ConfigService } from '@nestjs/config';
 import { UrlService } from './url.service';
 import { PrismaService } from '../../prisma/prisma.service';
+import { RedisService } from '../../redis/redis.service';
 
 // nanoid is ESM — mock it so Jest (CommonJS) can handle it
 jest.mock('nanoid', () => ({ nanoid: jest.fn(() => 'mockcode') }));
@@ -14,7 +15,17 @@ const mockPrisma = {
 };
 
 const mockConfig = {
-    get: jest.fn().mockReturnValue('http://localhost:3000'),
+    get: jest.fn().mockImplementation((key: string) => {
+        if (key === 'GOOGLE_SAFE_BROWSING_API_KEY') return undefined;
+        return 'http://localhost:3000';
+    }),
+};
+
+const mockRedis = {
+    get: jest.fn().mockResolvedValue(null),
+    set: jest.fn().mockResolvedValue(undefined),
+    setNx: jest.fn().mockResolvedValue(true),
+    del: jest.fn().mockResolvedValue(undefined),
 };
 
 describe('UrlService', () => {
@@ -22,11 +33,14 @@ describe('UrlService', () => {
 
     beforeEach(async () => {
         jest.clearAllMocks();
+        mockRedis.get.mockResolvedValue(null);
+        mockRedis.setNx.mockResolvedValue(true);
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 UrlService,
                 { provide: PrismaService, useValue: mockPrisma },
                 { provide: ConfigService, useValue: mockConfig },
+                { provide: RedisService, useValue: mockRedis },
             ],
         }).compile();
 
@@ -39,14 +53,17 @@ describe('UrlService', () => {
 
     it('creates a short URL successfully', async () => {
         mockPrisma.url.create.mockResolvedValue({
-            shortCode: 'abc123',
+            shortCode: 'mockcode',
             originalUrl: 'https://example.com',
+            password: null,
+            maxClicks: null,
+            qrCode: null,
         });
 
         const result = await service.createShortUrl({ originalUrl: 'https://example.com' });
 
-        expect(result.shortCode).toBe('abc123');
-        expect(result.shortUrl).toBe('http://localhost:3000/abc123');
+        expect(result.shortCode).toBe('mockcode');
+        expect(result.shortUrl).toBe('http://localhost:3000/mockcode');
         expect(mockPrisma.url.create).toHaveBeenCalledTimes(1);
     });
 
@@ -54,6 +71,9 @@ describe('UrlService', () => {
         mockPrisma.url.create.mockResolvedValue({
             shortCode: 'my-link',
             originalUrl: 'https://example.com',
+            password: null,
+            maxClicks: null,
+            qrCode: null,
         });
 
         const result = await service.createShortUrl({
@@ -80,7 +100,7 @@ describe('UrlService', () => {
         mockPrisma.url.create
             .mockRejectedValueOnce({ code: 'P2002' })
             .mockRejectedValueOnce({ code: 'P2002' })
-            .mockResolvedValue({ shortCode: 'newcode', originalUrl: 'https://example.com' });
+            .mockResolvedValue({ shortCode: 'newcode', originalUrl: 'https://example.com', password: null, maxClicks: null, qrCode: null });
 
         const result = await service.createShortUrl({ originalUrl: 'https://example.com' });
 
@@ -113,6 +133,9 @@ describe('UrlService', () => {
         mockPrisma.url.create.mockResolvedValue({
             shortCode: 'abc123',
             originalUrl: 'https://example.com',
+            password: null,
+            maxClicks: null,
+            qrCode: null,
         });
 
         await service.createShortUrl({ originalUrl: 'https://example.com', expiresAt: futureDate });

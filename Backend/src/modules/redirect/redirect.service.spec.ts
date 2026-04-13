@@ -35,13 +35,21 @@ describe('RedirectService', () => {
         expect(service).toBeDefined();
     });
 
-    it('returns cached URL on cache hit without hitting DB', async () => {
+    it('returns cached URL on cache hit without hitting DB twice', async () => {
+        mockPrisma.url.findUnique.mockResolvedValue({
+            originalUrl: 'https://example.com',
+            expiresAt: null,
+            password: null,
+            maxClicks: null,
+            clicks: 0,
+        });
         mockRedis.get.mockResolvedValue('https://example.com');
 
         const result = await service.getOriginalUrl('abc');
 
-        expect(result).toBe('https://example.com');
-        expect(mockPrisma.url.findUnique).not.toHaveBeenCalled();
+        expect(result.originalUrl).toBe('https://example.com');
+        expect(result.requiresPassword).toBe(false);
+        expect(mockRedis.set).not.toHaveBeenCalled();
     });
 
     it('fetches from DB on cache miss and caches the result', async () => {
@@ -49,12 +57,15 @@ describe('RedirectService', () => {
         mockPrisma.url.findUnique.mockResolvedValue({
             originalUrl: 'https://example.com',
             expiresAt: null,
+            password: null,
+            maxClicks: null,
+            clicks: 0,
         });
         mockRedis.set.mockResolvedValue(undefined);
 
         const result = await service.getOriginalUrl('abc');
 
-        expect(result).toBe('https://example.com');
+        expect(result.originalUrl).toBe('https://example.com');
         expect(mockRedis.set).toHaveBeenCalledWith('abc', 'https://example.com', 3600);
     });
 
@@ -64,6 +75,9 @@ describe('RedirectService', () => {
         mockPrisma.url.findUnique.mockResolvedValue({
             originalUrl: 'https://example.com',
             expiresAt,
+            password: null,
+            maxClicks: null,
+            clicks: 0,
         });
         mockRedis.set.mockResolvedValue(undefined);
 
@@ -86,6 +100,9 @@ describe('RedirectService', () => {
         mockPrisma.url.findUnique.mockResolvedValue({
             originalUrl: 'https://example.com',
             expiresAt: new Date(Date.now() - 1000), // 1 second ago
+            password: null,
+            maxClicks: null,
+            clicks: 0,
         });
 
         await expect(service.getOriginalUrl('expired')).rejects.toThrow(GoneException);

@@ -42,6 +42,7 @@ describe('AnalyticsService', () => {
             clicks: 10,
             createdAt,
             expiresAt: null,
+            clickEvents: [],
         });
         mockRedis.get.mockResolvedValue('5');
 
@@ -61,6 +62,7 @@ describe('AnalyticsService', () => {
             clicks: 7,
             createdAt: new Date(),
             expiresAt: null,
+            clickEvents: [],
         });
         mockRedis.get.mockResolvedValue(null);
 
@@ -77,6 +79,7 @@ describe('AnalyticsService', () => {
             clicks: 0,
             createdAt: new Date(),
             expiresAt: null,
+            clickEvents: [],
         });
         mockRedis.get.mockResolvedValue('0');
 
