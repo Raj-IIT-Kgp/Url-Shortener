@@ -71,40 +71,40 @@ export default function DashboardPage() {
     };
 
     if (loading) {
-        return <div className="text-center mt-20 text-slate-500">Loading...</div>;
+        return <div className="text-center mt-20 text-[var(--color-text-muted)]">Loading...</div>;
     }
 
     return (
         <div className="max-w-4xl mx-auto mt-10">
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold text-slate-900 dark:text-white">My URLs</h1>
+                <h1 className="text-3xl font-bold text-[var(--color-text)]">My URLs</h1>
                 <Link
                     href="/"
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                    className="bg-[var(--color-primary)] hover:opacity-90 text-white px-4 py-2 rounded-lg font-medium transition-colors"
                 >
                     Create New
                 </Link>
             </div>
 
             {urls.length === 0 ? (
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center">
-                    <p className="text-slate-500 dark:text-slate-400 mb-4">You haven't created any URLs yet.</p>
-                    <Link href="/" className="text-indigo-600 hover:underline">Go shorten one!</Link>
+                <div className="glass rounded-2xl p-12 text-center">
+                    <p className="text-[var(--color-text-muted)] mb-4">You haven&apos;t created any URLs yet.</p>
+                    <Link href="/" className="text-[var(--color-primary)] hover:underline">Go shorten one!</Link>
                 </div>
             ) : (
                 <div className="grid gap-4">
                     {urls.map(url => (
-                        <div key={url.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div key={url.id} className="glass rounded-xl p-5 glow-accent shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <div className="overflow-hidden">
                                 <div className="flex items-center gap-2 mb-1">
-                                    <span className="font-semibold text-lg text-indigo-600 dark:text-indigo-400">
+                                    <span className="font-semibold text-lg text-[var(--color-primary)]">
                                         /{url.shortCode}
                                     </span>
-                                    <span className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-1 rounded-full">
+                                    <span className="text-xs glass-light text-[var(--color-text-muted)] px-2 py-1 rounded-full">
                                         {url.clicks} clicks
                                     </span>
                                 </div>
-                                <p className="text-slate-500 dark:text-slate-400 text-sm truncate max-w-md">
+                                <p className="text-[var(--color-text-muted)] text-sm truncate max-w-md">
                                     {url.originalUrl}
                                 </p>
                             </div>
@@ -113,21 +113,21 @@ export default function DashboardPage() {
                                     href={`/${url.shortCode}`}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="p-2 text-slate-500 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50 dark:bg-slate-800 dark:hover:bg-indigo-900/30 rounded-lg transition-colors tooltip-trigger"
+                                    className="p-2 text-[var(--color-text-dim)] hover:text-[var(--color-primary)] glass-light rounded-lg transition-colors tooltip-trigger"
                                     title="Visit"
                                 >
                                     <ExternalLink className="w-5 h-5" />
                                 </a>
                                 <Link
                                     href={`/${url.shortCode}/stats`}
-                                    className="p-2 text-slate-500 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50 dark:bg-slate-800 dark:hover:bg-indigo-900/30 rounded-lg transition-colors tooltip-trigger"
+                                    className="p-2 text-[var(--color-text-dim)] hover:text-[var(--color-primary)] glass-light rounded-lg transition-colors tooltip-trigger"
                                     title="Stats"
                                 >
                                     <BarChart2 className="w-5 h-5" />
                                 </Link>
                                 <button
                                     onClick={() => handleDelete(url.shortCode)}
-                                    className="p-2 text-slate-500 hover:text-red-600 bg-slate-50 hover:bg-red-50 dark:bg-slate-800 dark:hover:bg-red-900/30 rounded-lg transition-colors ml-auto sm:ml-2 tooltip-trigger"
+                                    className="p-2 text-[var(--color-text-dim)] hover:text-[var(--color-error)] glass-light rounded-lg transition-colors ml-auto sm:ml-2 tooltip-trigger"
                                     title="Delete"
                                 >
                                     <Trash2 className="w-5 h-5" />
@@ -138,24 +138,24 @@ export default function DashboardPage() {
                 </div>
             )}
 
-            <div className="mt-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+            <div className="mt-12 glass rounded-2xl p-6 shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
-                    <Key className="w-5 h-5 text-indigo-600" />
-                    <h2 className="text-xl font-bold dark:text-white">Developer API Settings</h2>
+                    <Key className="w-5 h-5 text-[var(--color-primary)]" />
+                    <h2 className="text-xl font-bold text-[var(--color-text)]">Developer API Settings</h2>
                 </div>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                <p className="text-sm text-[var(--color-text-muted)] mb-6">
                     Use your API key to interact with our platform programmatically. Include it in your requests as an `x-api-key` header.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 items-center">
-                    <div className="flex-1 w-full font-mono text-sm p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg selection:bg-indigo-100 dark:selection:bg-indigo-900 truncate">
+                    <div className="flex-1 w-full font-mono text-sm p-3 glass-light border border-[var(--color-border)] rounded-lg selection:bg-[var(--color-primary)]/10 truncate text-[var(--color-text)]">
                         {apiKey || "No API key generated yet"}
                     </div>
                     <div className="flex gap-2 w-full sm:w-auto">
                         {apiKey && (
                             <button
                                 onClick={() => copyToClipboard(apiKey)}
-                                className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg transition-colors font-medium border border-slate-200 dark:border-slate-700"
+                                className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 glass hover:bg-[var(--color-surface-light)] text-[var(--color-text)] rounded-lg transition-colors font-medium border border-[var(--color-border)]"
                             >
                                 <Copy className="w-4 h-4" /> Copy
                             </button>
@@ -163,7 +163,7 @@ export default function DashboardPage() {
                         <button
                             onClick={handleGenerateApiKey}
                             disabled={apiKeyLoading}
-                            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium disabled:opacity-50"
+                            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 bg-[var(--color-primary)] hover:opacity-90 text-white rounded-lg transition-colors font-medium disabled:opacity-50"
                         >
                             <RefreshCw className={`w-4 h-4 ${apiKeyLoading ? "animate-spin" : ""}`} />
                             {apiKey ? "Regenerate" : "Generate"}

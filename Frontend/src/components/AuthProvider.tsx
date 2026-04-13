@@ -32,7 +32,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (storedToken && storedUser) {
             try {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setUser(JSON.parse(storedUser));
+                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setToken(storedToken);
             } catch (e) {
                 console.error("Failed to parse stored user", e);

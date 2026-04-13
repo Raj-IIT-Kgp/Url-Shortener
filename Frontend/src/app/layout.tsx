@@ -19,7 +19,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en" className="dark">
+        <html lang="en">
             <head>
                 <link rel="icon" href="/favicon.ico" sizes="any" />
                 <link
@@ -36,15 +36,14 @@ export default function RootLayout({
                 />
             </head>
             <body
-                className={`${inter.className} min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50 selection:bg-indigo-500/30 transition-colors duration-300`}
+                className={`${inter.className} min-h-screen selection:bg-indigo-500/30 transition-colors duration-300`}
             >
-                <div className="absolute inset-0 z-[-1] bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-indigo-950 dark:via-slate-950 dark:to-purple-950 opacity-50 block dark:hidden"></div>
                 <ToastProvider>
                     <AuthProvider>
                         <Header />
-                        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
                             {children}
-                        </main>
+                        </div>
                     </AuthProvider>
                 </ToastProvider>
             </body>

@@ -1,0 +1,96 @@
+
+> frontend@0.1.0 lint
+> eslint
+
+
+/Users/rajmajumdermac/Code/url-shortener/Frontend/src/app/[code]/route.ts
+  45:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/rajmajumdermac/Code/url-shortener/Frontend/src/app/bulk/page.tsx
+  19:13  warning  'toasts' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  19:28  warning  'dismiss' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/rajmajumdermac/Code/url-shortener/Frontend/src/app/dashboard/page.tsx
+  49:18  warning  'err' is defined but never used                                  @typescript-eslint/no-unused-vars
+  68:18  warning  'err' is defined but never used                                  @typescript-eslint/no-unused-vars
+  91:81  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/rajmajumdermac/Code/url-shortener/Frontend/src/app/guide/page.tsx
+  11:5   warning  'MousePointer2' is defined but never used                        @typescript-eslint/no-unused-vars
+  12:5   warning  'RefreshCcw' is defined but never used                           @typescript-eslint/no-unused-vars
+  13:5   warning  'Globe' is defined but never used                                @typescript-eslint/no-unused-vars
+  65:60  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/rajmajumdermac/Code/url-shortener/Frontend/src/app/layout.tsx
+  5:10  warning  'ThemeToggle' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/rajmajumdermac/Code/url-shortener/Frontend/src/app/login/page.tsx
+  26:23  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  68:20  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/rajmajumdermac/Code/url-shortener/Frontend/src/app/page.tsx
+  22:13  warning  'toasts' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  22:28  warning  'dismiss' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/rajmajumdermac/Code/url-shortener/Frontend/src/app/register/page.tsx
+  26:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/rajmajumdermac/Code/url-shortener/Frontend/src/components/AuthProvider.tsx
+  35:17  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/rajmajumdermac/Code/url-shortener/Frontend/src/components/AuthProvider.tsx:35:17
+  33 |         if (storedToken && storedUser) {
+  34 |             try {
+> 35 |                 setUser(JSON.parse(storedUser));
+     |                 ^^^^^^^ Avoid calling setState() directly within an effect
+  36 |                 setToken(storedToken);
+  37 |             } catch (e) {
+  38 |                 console.error("Failed to parse stored user", e);  react-hooks/set-state-in-effect
+
+/Users/rajmajumdermac/Code/url-shortener/Frontend/src/components/Header.tsx
+  6:18  warning  'User' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/rajmajumdermac/Code/url-shortener/Frontend/src/components/RecentLinks.tsx
+  29:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/rajmajumdermac/Code/url-shortener/Frontend/src/components/RecentLinks.tsx:29:9
+  27 |     useEffect(() => {
+  28 |         const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+> 29 |         setLinks(stored);
+     |         ^^^^^^^^ Avoid calling setState() directly within an effect
+  30 |         setVisible(stored.length > 0);
+  31 |     }, []);
+  32 |  react-hooks/set-state-in-effect
+
+/Users/rajmajumdermac/Code/url-shortener/Frontend/src/components/ThemeToggle.tsx
+  11:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/rajmajumdermac/Code/url-shortener/Frontend/src/components/ThemeToggle.tsx:11:9
+   9 |         const saved = localStorage.getItem("snip-theme") as "dark" | "light" | null;
+  10 |         const initial = saved || "dark";
+> 11 |         setTheme(initial);
+     |         ^^^^^^^^ Avoid calling setState() directly within an effect
+  12 |         document.documentElement.setAttribute("data-theme", initial);
+  13 |         if (initial === "dark") {
+  14 |             document.documentElement.classList.add("dark");  react-hooks/set-state-in-effect
+
+✖ 20 problems (8 errors, 12 warnings)
+

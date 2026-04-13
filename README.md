@@ -55,7 +55,7 @@ graph TD
 4. Access the services:
    - **Frontend**: [http://localhost](http://localhost)
    - **API Docs (Swagger)**: [http://localhost/api/docs](http://localhost/api/docs)
-   - **Metrics**: [http://localhost/api/api/metrics](http://localhost/api/api/metrics)
+   - **Metrics**: [http://localhost/api/metrics](http://localhost/api/metrics)
    - **Grafana**: [http://localhost:3002](http://localhost:3002) (Login: `admin`/`admin`)
 
 ## 🔑 Environment Variables
@@ -65,6 +65,7 @@ graph TD
 | `DATABASE_URL` | PostgreSQL Connection String | `postgresql://admin:password@postgres:5432/db` |
 | `REDIS_URL` | Redis Connection String | `redis://redis:6379` |
 | `KAFKA_BROKERS` | Kafka Broker addresses | `kafka:9092` |
+| `JWT_SECRET` | Secret key for issuing session tokens | `required` |
 | `GOOGLE_SAFE_BROWSING_API_KEY` | Key for malware detection | Required for security features |
 | `GRAFANA_PASSWORD` | Admin password for Grafana | `admin` |
 
