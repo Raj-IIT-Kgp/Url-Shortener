@@ -61,15 +61,16 @@ async function bootstrap() {
         logger.warn(`Kafka consumer failed to start (will retry automatically): ${err.message}`);
     });
 
-    const port = process.env.PORT ?? 3000;
-    await app.listen(port, '0.0.0.0');
-    logger.log(`Application running on port ${port}`);
-    logger.log(`Swagger docs available at http://localhost:${port}/api/docs`);
-    logger.log(`CORS allowed origin: ${allowedOrigin}`);
+    const configService = app.get(ConfigService);
+    const port = configService.get<number>('PORT') || 3001;
 
+    await app.listen(port, '0.0.0.0');
+    logger.log(`Application is running on: http://0.0.0.0:${port}`);
+    logger.log(`Swagger docs available at: http://localhost:${port}/api/docs`);
+    logger.log(`CORS allowed origin: ${allowedOrigin}`);
 }
 
-// Start batch processor in-process (flushes Redis click counters to Postgres every 10s)
+import { ConfigService } from '@nestjs/config';
 import './queue/batch.processor.js';
 
 bootstrap();
