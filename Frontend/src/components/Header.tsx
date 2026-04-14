@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { useAuth } from "./AuthProvider";
 import { ThemeToggle } from "./ThemeToggle";
-import { LogOut, User, LayoutDashboard } from "lucide-react";
+import { LogOut, LayoutDashboard } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export function Header() {
     const { user, logout } = useAuth();
+    const pathname = usePathname();
 
     return (
         <header className="absolute top-0 right-0 left-0 p-4 flex justify-between items-center z-50 max-w-7xl mx-auto w-full">
@@ -22,10 +24,12 @@ export function Header() {
             <div className="flex items-center gap-4">
                 {user ? (
                     <>
-                        <Link href="/dashboard" className="text-sm font-medium hover:text-[var(--color-primary)] text-[var(--color-text)] flex items-center gap-1 transition-colors">
-                            <LayoutDashboard className="w-4 h-4" />
-                            Dashboard
-                        </Link>
+                        {pathname !== "/dashboard" && (
+                            <Link href="/dashboard" className="text-sm font-medium hover:text-[var(--color-primary)] text-[var(--color-text)] flex items-center gap-1 transition-colors">
+                                <LayoutDashboard className="w-4 h-4" />
+                                Dashboard
+                            </Link>
+                        )}
                         <button
                             onClick={logout}
                             className="text-sm font-medium text-[var(--color-text-muted)] hover:text-[var(--color-error)] flex items-center gap-1 transition-colors"
