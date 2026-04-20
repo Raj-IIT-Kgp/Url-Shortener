@@ -29,7 +29,7 @@ CLAUDE.md
 GEMINI.md
 .mcp.json
 .opencode.json
-PROJECT.txt
+
 
 # Docker & Databases
 docker-compose.yml
