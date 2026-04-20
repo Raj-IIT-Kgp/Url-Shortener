@@ -46,6 +46,8 @@ grafana_data/
 *.sqlite
 *.sqlite-journal
 
+PROJECT.txt
+
 # Temporary and Build files
 .cache/
 .tmp/
