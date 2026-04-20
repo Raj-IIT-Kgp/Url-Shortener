@@ -22,6 +22,7 @@ export interface UrlStats {
     browsers: { label: string; count: number }[];
     devices: { label: string; count: number }[];
     countries: { label: string; count: number }[];
+    clicksPerDay: { date: string; count: number }[];
 }
 
 export interface UserUrl {
@@ -34,19 +35,17 @@ export interface UserUrl {
     maxClicks: number | null;
 }
 
+// access_token in body; refresh_token is set as httpOnly cookie by the server
 export interface AuthResponse {
     access_token: string;
-    user: { id: string; email: string, apiKey?: string };
+    user: { id: string; email: string; hasApiKey?: boolean };
 }
 
-function getHeaders(): HeadersInit {
+function getAuthHeaders(): HeadersInit {
     const headers: HeadersInit = { "Content-Type": "application/json" };
-    // We can run in browser or server. If browser, get token from localStorage
     if (typeof window !== "undefined") {
         const token = localStorage.getItem("token");
-        if (token) {
-            headers["Authorization"] = `Bearer ${token}`;
-        }
+        if (token) headers["Authorization"] = `Bearer ${token}`;
     }
     return headers;
 }
@@ -73,7 +72,7 @@ export async function createShortUrl(
 ): Promise<CreateUrlResponse> {
     const res = await fetch(`${API_URL}/url`, {
         method: "POST",
-        headers: getHeaders(),
+        headers: getAuthHeaders(),
         body: JSON.stringify({
             originalUrl,
             ...(customAlias ? { customAlias } : {}),
@@ -87,7 +86,7 @@ export async function createShortUrl(
 }
 
 export async function getStats(code: string): Promise<UrlStats> {
-    const res = await fetch(`${API_URL}/url/${code}/stats`, { headers: getHeaders() });
+    const res = await fetch(`${API_URL}/url/${code}/stats`, { headers: getAuthHeaders() });
     return handleResponse<UrlStats>(res);
 }
 
@@ -97,16 +96,18 @@ export async function verifyPassword(
 ): Promise<{ valid: boolean; originalUrl?: string }> {
     const res = await fetch(`${API_URL}/url/${code}/unlock`, {
         method: "POST",
-        headers: getHeaders(),
+        headers: getAuthHeaders(),
         body: JSON.stringify({ password }),
     });
     return handleResponse<{ valid: boolean; originalUrl?: string }>(res);
 }
 
+// credentials: 'include' sends the httpOnly refresh_token cookie to /auth/* endpoints
 export async function loginUser(email: string, password: string): Promise<AuthResponse> {
     const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email, password }),
     });
     return handleResponse<AuthResponse>(res);
@@ -116,34 +117,58 @@ export async function registerUser(email: string, password: string): Promise<Aut
     const res = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email, password }),
     });
     return handleResponse<AuthResponse>(res);
 }
 
+// Silently exchange the httpOnly refresh cookie for a new access token
+export async function refreshTokenApi(): Promise<AuthResponse> {
+    const res = await fetch(`${API_URL}/auth/refresh`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+    });
+    return handleResponse<AuthResponse>(res);
+}
+
+// Clears the refresh cookie server-side and blocklists the current access token
+export async function logoutApi(): Promise<void> {
+    const headers: HeadersInit = { "Content-Type": "application/json" };
+    if (typeof window !== "undefined") {
+        const token = localStorage.getItem("token");
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+    }
+    await fetch(`${API_URL}/auth/logout`, {
+        method: "POST",
+        headers,
+        credentials: "include",
+    });
+}
+
 export async function getMyUrls(): Promise<UserUrl[]> {
-    const res = await fetch(`${API_URL}/url/my-links`, { headers: getHeaders() });
+    const res = await fetch(`${API_URL}/url/my-links`, { headers: getAuthHeaders() });
     return handleResponse<UserUrl[]>(res);
 }
 
 export async function deleteUrl(code: string): Promise<{ success: boolean }> {
     const res = await fetch(`${API_URL}/url/${code}`, {
         method: "DELETE",
-        headers: getHeaders(),
+        headers: getAuthHeaders(),
     });
     return handleResponse<{ success: boolean }>(res);
 }
 
-export async function getApiKey(): Promise<{ apiKey: string }> {
-    const res = await fetch(`${API_URL}/auth/api-key`, { headers: getHeaders() });
-    return handleResponse<{ apiKey: string }>(res);
+export async function getApiKey(): Promise<{ hasApiKey: boolean }> {
+    const res = await fetch(`${API_URL}/auth/api-key`, { headers: getAuthHeaders() });
+    return handleResponse<{ hasApiKey: boolean }>(res);
 }
 
 export async function generateApiKey(): Promise<{ apiKey: string }> {
     const res = await fetch(`${API_URL}/auth/api-key/generate`, {
         method: "POST",
-        headers: getHeaders(),
+        headers: getAuthHeaders(),
     });
     return handleResponse<{ apiKey: string }>(res);
 }
-

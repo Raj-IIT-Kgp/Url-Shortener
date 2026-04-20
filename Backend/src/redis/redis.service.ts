@@ -28,4 +28,8 @@ export class RedisService {
         const result = await this.client.set(key, value, 'EX', ttlSeconds, 'NX');
         return result === 'OK';
     }
+
+    async expire(key: string, ttlSeconds: number): Promise<void> {
+        await this.client.expire(key, ttlSeconds);
+    }
 }

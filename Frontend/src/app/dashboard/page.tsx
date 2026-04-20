@@ -15,7 +15,9 @@ export default function DashboardPage() {
     const { toast } = useToast();
     const [urls, setUrls] = useState<UserUrl[]>([]);
     const [loading, setLoading] = useState(true);
-    const [apiKey, setApiKey] = useState<string | null>(null);
+    const [hasApiKey, setHasApiKey] = useState(false);
+    // plaintext key — only set immediately after generation, never persisted
+    const [newApiKey, setNewApiKey] = useState<string | null>(null);
     const [apiKeyLoading, setApiKeyLoading] = useState(false);
 
     useEffect(() => {
@@ -28,7 +30,7 @@ export default function DashboardPage() {
             try {
                 const [urlsData, apiData] = await Promise.all([getMyUrls(), getApiKey()]);
                 setUrls(urlsData);
-                setApiKey(apiData.apiKey);
+                setHasApiKey(apiData.hasApiKey);
             } catch (err) {
                 console.error(err);
                 toast("Failed to load dashboard data", "error");
@@ -36,18 +38,20 @@ export default function DashboardPage() {
                 setLoading(false);
             }
         };
- 
+
         fetchInitialData();
     }, [user, router, toast]);
 
     const handleGenerateApiKey = async () => {
         setApiKeyLoading(true);
+        setNewApiKey(null);
         try {
             const data = await generateApiKey();
-            setApiKey(data.apiKey);
-            toast("New API Key generated!", "success");
-        } catch (err) {
-            toast("Failed to generate API Key", "error");
+            setNewApiKey(data.apiKey);
+            setHasApiKey(true);
+            toast("New API key generated — copy it now, it won't be shown again", "success");
+        } catch {
+            toast("Failed to generate API key", "error");
         } finally {
             setApiKeyLoading(false);
         }
@@ -147,14 +151,20 @@ export default function DashboardPage() {
                     Use your API key to interact with our platform programmatically. Include it in your requests as an `x-api-key` header.
                 </p>
 
+                {newApiKey && (
+                    <div className="mb-4 p-3 rounded-lg bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 text-sm text-[var(--color-warning)]">
+                        Copy your key now — it will never be shown again.
+                    </div>
+                )}
+
                 <div className="flex flex-col sm:flex-row gap-4 items-center">
-                    <div className="flex-1 w-full font-mono text-sm p-3 glass-light border border-[var(--color-border)] rounded-lg selection:bg-[var(--color-primary)]/10 truncate text-[var(--color-text)]">
-                        {apiKey || "No API key generated yet"}
+                    <div className="flex-1 w-full font-mono text-sm p-3 glass-light border border-[var(--color-border)] rounded-lg truncate text-[var(--color-text)]">
+                        {newApiKey ?? (hasApiKey ? "••••••••••••••••  (key active)" : "No API key generated yet")}
                     </div>
                     <div className="flex gap-2 w-full sm:w-auto">
-                        {apiKey && (
+                        {newApiKey && (
                             <button
-                                onClick={() => copyToClipboard(apiKey)}
+                                onClick={() => copyToClipboard(newApiKey)}
                                 className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 glass hover:bg-[var(--color-surface-light)] text-[var(--color-text)] rounded-lg transition-colors font-medium border border-[var(--color-border)]"
                             >
                                 <Copy className="w-4 h-4" /> Copy
@@ -166,7 +176,7 @@ export default function DashboardPage() {
                             className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 bg-[var(--color-primary)] hover:opacity-90 text-white rounded-lg transition-colors font-medium disabled:opacity-50"
                         >
                             <RefreshCw className={`w-4 h-4 ${apiKeyLoading ? "animate-spin" : ""}`} />
-                            {apiKey ? "Regenerate" : "Generate"}
+                            {hasApiKey ? "Regenerate" : "Generate"}
                         </button>
                     </div>
                 </div>

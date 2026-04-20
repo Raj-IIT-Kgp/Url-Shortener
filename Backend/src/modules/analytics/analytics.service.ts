@@ -46,6 +46,27 @@ export class AnalyticsService {
                 .slice(0, 10)
                 .map(([label, count]) => ({ label, count }));
 
+        // Time-series: clicks per day for the last 30 days
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        const timeSeriesEvents = await this.prisma.clickEvent.findMany({
+            where: { urlId: url.id, createdAt: { gte: thirtyDaysAgo } },
+            select: { createdAt: true },
+            orderBy: { createdAt: 'asc' },
+        });
+
+        const dayCounts: Record<string, number> = {};
+        for (const ev of timeSeriesEvents) {
+            const day = ev.createdAt.toISOString().slice(0, 10);
+            dayCounts[day] = (dayCounts[day] || 0) + 1;
+        }
+
+        const clicksPerDay: { date: string; count: number }[] = [];
+        for (let i = 29; i >= 0; i--) {
+            const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+            const dateStr = d.toISOString().slice(0, 10);
+            clicksPerDay.push({ date: dateStr, count: dayCounts[dateStr] || 0 });
+        }
+
         return {
             shortCode: code,
             originalUrl: url.originalUrl,
@@ -60,6 +81,7 @@ export class AnalyticsService {
             browsers: toTopList(browserCounts),
             devices: toTopList(deviceCounts),
             countries: toTopList(countryCounts),
+            clicksPerDay,
         };
     }
 }

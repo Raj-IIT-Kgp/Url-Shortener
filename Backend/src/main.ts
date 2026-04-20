@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, Logger } from '@nestjs/common';
@@ -11,12 +12,15 @@ async function bootstrap() {
     // Graceful shutdown
     app.enableShutdownHooks();
 
+    // Cookie parsing (required for httpOnly refresh token)
+    app.use(cookieParser());
+
     // CORS — restrict to the configured frontend origin
     const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:3001';
     app.enableCors({
         origin: allowedOrigin,
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-        allowedHeaders: 'Content-Type, Accept, Authorization',
+        allowedHeaders: 'Content-Type, Accept, Authorization, X-Api-Key, Idempotency-Key',
         credentials: true,
     });
 

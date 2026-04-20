@@ -8,6 +8,9 @@ const mockPrisma = {
     url: {
         findUnique: jest.fn(),
     },
+    clickEvent: {
+        findMany: jest.fn().mockResolvedValue([]),
+    },
 };
 
 const mockRedis = {
@@ -37,6 +40,7 @@ describe('AnalyticsService', () => {
     it('returns stats with combined DB + pending click count', async () => {
         const createdAt = new Date();
         mockPrisma.url.findUnique.mockResolvedValue({
+            id: 'url-1',
             shortCode: 'abc',
             originalUrl: 'https://example.com',
             clicks: 10,
@@ -57,6 +61,7 @@ describe('AnalyticsService', () => {
 
     it('handles no pending clicks (Redis returns null)', async () => {
         mockPrisma.url.findUnique.mockResolvedValue({
+            id: 'url-1',
             shortCode: 'abc',
             originalUrl: 'https://example.com',
             clicks: 7,
@@ -74,6 +79,7 @@ describe('AnalyticsService', () => {
 
     it('checks redis for clicks:code key', async () => {
         mockPrisma.url.findUnique.mockResolvedValue({
+            id: 'url-1',
             shortCode: 'abc',
             originalUrl: 'https://example.com',
             clicks: 0,
@@ -92,5 +98,29 @@ describe('AnalyticsService', () => {
         mockPrisma.url.findUnique.mockResolvedValue(null);
 
         await expect(service.getStats('notfound')).rejects.toThrow(NotFoundException);
+    });
+
+    it('returns clicksPerDay with 30 entries', async () => {
+        mockPrisma.url.findUnique.mockResolvedValue({
+            id: 'url-1',
+            shortCode: 'abc',
+            originalUrl: 'https://example.com',
+            clicks: 0,
+            createdAt: new Date(),
+            expiresAt: null,
+            clickEvents: [],
+        });
+        mockRedis.get.mockResolvedValue(null);
+        const today = new Date().toISOString().slice(0, 10);
+        mockPrisma.clickEvent.findMany.mockResolvedValue([
+            { createdAt: new Date() },
+            { createdAt: new Date() },
+        ]);
+
+        const stats = await service.getStats('abc');
+
+        expect(stats.clicksPerDay).toHaveLength(30);
+        const todayEntry = stats.clicksPerDay.find((d) => d.date === today);
+        expect(todayEntry?.count).toBe(2);
     });
 });

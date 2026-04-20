@@ -6,6 +6,60 @@ import Link from "next/link";
 import { use } from "react";
 import Image from "next/image";
 
+function ClicksChart({ data }: { data: { date: string; count: number }[] }) {
+    if (!data || data.length === 0) return null;
+    const max = Math.max(...data.map((d) => d.count), 1);
+
+    // Show only every 5th label to avoid crowding
+    const labeledIndices = new Set([0, 4, 9, 14, 19, 24, 29]);
+
+    return (
+        <div className="w-full max-w-3xl glass rounded-2xl p-6 mb-8">
+            <h2 className="text-sm font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-5">
+                Clicks — Last 30 Days
+            </h2>
+            <div className="flex items-end gap-[3px] h-24">
+                {data.map((d, i) => {
+                    const pct = Math.round((d.count / max) * 100);
+                    return (
+                        <div key={d.date} className="flex-1 flex flex-col items-center gap-1 group relative">
+                            <div
+                                className="w-full rounded-sm transition-all duration-200"
+                                style={{
+                                    height: `${Math.max(pct, d.count > 0 ? 4 : 1)}%`,
+                                    background: d.count > 0
+                                        ? 'linear-gradient(to top, var(--color-primary-dark), var(--color-primary-light))'
+                                        : 'var(--color-surface-light)',
+                                }}
+                            />
+                            {/* Tooltip */}
+                            <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:flex flex-col items-center z-10 pointer-events-none">
+                                <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-2 py-1 text-xs whitespace-nowrap shadow-lg">
+                                    <p className="text-[var(--color-text)] font-semibold">{d.count} click{d.count !== 1 ? 's' : ''}</p>
+                                    <p className="text-[var(--color-text-dim)]">{d.date}</p>
+                                </div>
+                                <div className="w-2 h-2 bg-[var(--color-surface)] border-r border-b border-[var(--color-border)] rotate-45 -mt-1" />
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+            {/* X-axis labels */}
+            <div className="flex items-end gap-[3px] mt-1">
+                {data.map((d, i) => (
+                    <div key={d.date} className="flex-1 text-center">
+                        {labeledIndices.has(i) && (
+                            <span className="text-[9px] text-[var(--color-text-dim)]">
+                                {d.date.slice(5)}
+                            </span>
+                        )}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 function BreakdownBar({ items, total }: { items: { label: string; count: number }[]; total: number }) {
     if (!items || items.length === 0) return <p className="text-sm text-[var(--color-text-dim)]">No data yet</p>;
     return (
@@ -108,6 +162,11 @@ export default function StatsPage({ params }: { params: Promise<{ code: string }
                     </div>
                 ))}
             </div>
+
+            {/* Clicks over time */}
+            {stats.clicksPerDay && stats.clicksPerDay.some((d) => d.count > 0) && (
+                <ClicksChart data={stats.clicksPerDay} />
+            )}
 
             {/* Analytics Breakdown */}
             {stats.totalClicks > 0 && (

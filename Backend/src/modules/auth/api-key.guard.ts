@@ -1,5 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
@@ -7,19 +8,13 @@ export class ApiKeyGuard implements CanActivate {
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
-        const apiKey = request.headers['x-api-key'];
+        const apiKey: string | undefined = request.headers['x-api-key'];
+        if (!apiKey) return true;
 
-        if (!apiKey) {
-            return true;
-        }
-
-        const user = await this.prisma.user.findUnique({
-            where: { apiKey },
-        });
-
-        if (!user) {
-            throw new UnauthorizedException('Invalid API Key');
-        }
+        // Compare SHA-256 hash of incoming key against stored hash — plaintext never hits the DB
+        const hash = crypto.createHash('sha256').update(apiKey).digest('hex');
+        const user = await this.prisma.user.findUnique({ where: { apiKey: hash } });
+        if (!user) throw new UnauthorizedException('Invalid API key');
 
         request.user = user;
         return true;
