@@ -19,7 +19,7 @@ export default function Home() {
     const [copied, setCopied] = useState(false);
     const [showQr, setShowQr] = useState(false);
     const urlInputRef = useRef<HTMLInputElement>(null);
-    const { toasts, toast, dismiss } = useToast();
+    const { toast } = useToast();
 
     // ── Cmd/Ctrl+K focuses the input
     useEffect(() => {

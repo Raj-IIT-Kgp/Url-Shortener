@@ -19,7 +19,7 @@ function ClicksChart({ data }: { data: { date: string; count: number }[] }) {
                 Clicks — Last 30 Days
             </h2>
             <div className="flex items-end gap-[3px] h-24">
-                {data.map((d, i) => {
+                {data.map((d) => {
                     const pct = Math.round((d.count / max) * 100);
                     return (
                         <div key={d.date} className="flex-1 flex flex-col items-center gap-1 group relative">

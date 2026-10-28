@@ -51,7 +51,7 @@ export async function GET(
 
         // 404 / 410 / other errors — redirect home with error info
         return NextResponse.redirect(`${baseUrl}/?error=${res.status}`);
-    } catch (e) {
+    } catch {
         return NextResponse.redirect(`${baseUrl}/`);
     }
 }

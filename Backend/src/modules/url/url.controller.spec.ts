@@ -7,6 +7,7 @@ import { UrlService } from './url.service';
 import { RateLimiterService } from '../../common/rate-limiter.service';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { PrismaService } from '../../prisma/prisma.service';
+import { KafkaProducerService } from '../../kafka/kafka.producer.service';
 
 describe('UrlController', () => {
   let controller: UrlController;
@@ -19,6 +20,7 @@ describe('UrlController', () => {
         { provide: RateLimiterService, useValue: {} },
         { provide: AnalyticsService, useValue: {} },
         { provide: PrismaService, useValue: {} },
+        { provide: KafkaProducerService, useValue: {} },
       ],
     }).compile();
 

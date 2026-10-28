@@ -64,6 +64,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (storedToken && storedUser && !isTokenExpired(storedToken)) {
             try {
+                // localStorage is unavailable during SSR, so the session can only be restored after mount
+                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setUser(JSON.parse(storedUser));
                 setToken(storedToken);
             } catch {
@@ -76,7 +78,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         refreshTokenApi()
             .then(applySession)
             .catch(clearSession);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const login = (data: AuthResponse) => {
@@ -86,7 +87,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const logout = useCallback(async () => {
         await logoutApi().catch(() => {}); // server clears cookie + blocklists jti
         clearSession();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const refreshAccessToken = useCallback(async (): Promise<string | null> => {
@@ -98,7 +98,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             clearSession();
             return null;
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

@@ -6,8 +6,8 @@ import { RateLimiterService } from '../../common/rate-limiter.service';
 import { KafkaModule } from '../../kafka/kafka.module';
 
 @Module({
-    imports: [KafkaModule],
-    providers: [RedirectService, PrismaService, RateLimiterService],
-    controllers: [RedirectController],
+  imports: [KafkaModule],
+  providers: [RedirectService, PrismaService, RateLimiterService],
+  controllers: [RedirectController],
 })
 export class RedirectModule {}

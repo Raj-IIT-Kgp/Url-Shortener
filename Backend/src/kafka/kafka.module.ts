@@ -8,31 +8,33 @@ import { GeoModule } from '../geo/geo.module';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Module({
-    imports: [
-        ClientsModule.registerAsync([
-            {
-                name: 'KAFKA_CLIENT',
-                imports: [ConfigModule],
-                useFactory: (config: ConfigService) => ({
-                    transport: Transport.KAFKA,
-                    options: {
-                        client: {
-                            clientId: 'url-shortener',
-                            brokers: (config.get<string>('KAFKA_BROKERS', 'kafka:9092')).split(','),
-                        },
-                        consumer: {
-                            groupId: 'url-shortener-consumer',
-                        },
-                    },
-                }),
-                inject: [ConfigService],
+  imports: [
+    ClientsModule.registerAsync([
+      {
+        name: 'KAFKA_CLIENT',
+        imports: [ConfigModule],
+        useFactory: (config: ConfigService) => ({
+          transport: Transport.KAFKA,
+          options: {
+            client: {
+              clientId: 'url-shortener',
+              brokers: config
+                .get<string>('KAFKA_BROKERS', 'kafka:9092')
+                .split(','),
             },
-        ]),
-        RedisModule,
-        GeoModule,
-    ],
-    controllers: [KafkaConsumerService],
-    providers: [KafkaProducerService, PrismaService],
-    exports: [KafkaProducerService],
+            consumer: {
+              groupId: 'url-shortener-consumer',
+            },
+          },
+        }),
+        inject: [ConfigService],
+      },
+    ]),
+    RedisModule,
+    GeoModule,
+  ],
+  controllers: [KafkaConsumerService],
+  providers: [KafkaProducerService, PrismaService],
+  exports: [KafkaProducerService],
 })
 export class KafkaModule {}

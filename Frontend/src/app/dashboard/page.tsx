@@ -69,7 +69,7 @@ export default function DashboardPage() {
             await deleteUrl(code);
             setUrls(urls.filter(u => u.shortCode !== code));
             toast("URL has been removed", "success");
-        } catch (err) {
+        } catch {
             toast("Failed to delete URL", "error");
         }
     };

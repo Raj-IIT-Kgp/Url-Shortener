@@ -16,19 +16,22 @@ import { AuthModule } from './modules/auth/auth.module';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 @Module({
-    imports: [
-        ConfigModule.forRoot({ isGlobal: true, validationSchema: envValidationSchema }),
-        HealthModule,
-        PrometheusModule.register({ path: '/metrics' }),
-        RedisModule,
-        KafkaModule,
-        GeoModule,
-        UrlModule,
-        AnalyticsModule,
-        AuthModule,
-        RedirectModule,
-    ],
-    controllers: [AppController],
-    providers: [AppService, PrismaService, RateLimiterService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: envValidationSchema,
+    }),
+    HealthModule,
+    PrometheusModule.register({ path: '/metrics' }),
+    RedisModule,
+    KafkaModule,
+    GeoModule,
+    UrlModule,
+    AnalyticsModule,
+    AuthModule,
+    RedirectModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService, PrismaService, RateLimiterService],
 })
 export class AppModule {}

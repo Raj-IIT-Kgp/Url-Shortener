@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Res, Req, HttpCode, HttpStatus, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Res,
+  Req,
+  HttpStatus,
+  NotFoundException,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RedirectService } from './redirect.service';
 import type { Response, Request } from 'express';
@@ -10,30 +18,36 @@ const RESERVED_PATHS = new Set(['health', 'metrics', 'url', 'auth', 'api']);
 @ApiTags('redirect')
 @Controller()
 export class RedirectController {
-    constructor(
-        private readonly redirectService: RedirectService,
-        private readonly rateLimiter: RateLimiterService,
-        private readonly kafkaProducer: KafkaProducerService,
-    ) {}
+  constructor(
+    private readonly redirectService: RedirectService,
+    private readonly rateLimiter: RateLimiterService,
+    private readonly kafkaProducer: KafkaProducerService,
+  ) {}
 
-    @Get(':code')
-    @ApiOperation({ summary: 'Redirect to original URL by short code' })
-    async redirect(@Param('code') code: string, @Req() req: Request, @Res() res: Response) {
-        if (RESERVED_PATHS.has(code)) throw new NotFoundException();
-        await this.rateLimiter.consume(req.ip ?? '');
+  @Get(':code')
+  @ApiOperation({ summary: 'Redirect to original URL by short code' })
+  async redirect(
+    @Param('code') code: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    if (RESERVED_PATHS.has(code)) throw new NotFoundException();
+    await this.rateLimiter.consumeRedirect(req.ip ?? '');
 
-        const result = await this.redirectService.getOriginalUrl(code);
+    const result = await this.redirectService.getOriginalUrl(code);
 
-        if (result.requiresPassword) {
-            // Return JSON so frontend can redirect to unlock page
-            return res.status(HttpStatus.OK).json({ requiresPassword: true, shortCode: code });
-        }
-
-        const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.ip || '';
-        const userAgent = req.headers['user-agent'] || '';
-
-        void this.kafkaProducer.publishClickEvent(code, ip, userAgent);
-
-        return res.redirect(result.originalUrl!);
+    if (result.requiresPassword) {
+      // Return JSON so frontend can redirect to unlock page
+      return res
+        .status(HttpStatus.OK)
+        .json({ requiresPassword: true, shortCode: code });
     }
+
+    const ip = req.ip ?? '';
+    const userAgent = req.headers['user-agent'] || '';
+
+    this.kafkaProducer.publishClickEvent(code, ip, userAgent);
+
+    return res.redirect(result.originalUrl!);
+  }
 }

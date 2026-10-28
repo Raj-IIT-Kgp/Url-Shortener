@@ -16,7 +16,7 @@ export default function BulkPage() {
     const [input, setInput] = useState("");
     const [results, setResults] = useState<BulkResult[]>([]);
     const [loading, setLoading] = useState(false);
-    const { toasts, toast, dismiss } = useToast();
+    const { toast } = useToast();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

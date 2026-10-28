@@ -28,7 +28,6 @@ export function RecentLinks() {
         const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setLinks(stored);
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setVisible(stored.length > 0);
     }, []);
 
@@ -36,9 +35,7 @@ export function RecentLinks() {
     useEffect(() => {
         const handler = () => {
             const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             setLinks(stored);
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             setVisible(stored.length > 0);
         };
         window.addEventListener("snip-recent-updated", handler);

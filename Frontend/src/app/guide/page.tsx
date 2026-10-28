@@ -8,9 +8,6 @@ import {
     Key, 
     Webhook, 
     BarChart3, 
-    MousePointer2, 
-    RefreshCcw, 
-    Globe,
     ExternalLink,
     Terminal
 } from 'lucide-react';
